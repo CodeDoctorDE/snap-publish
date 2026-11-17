@@ -222,18 +222,22 @@ describe('process.env', () => {
     expect(execMock).not.toHaveBeenCalledWith('snapcraft', ['logout'])
   })
 
-  test('SnapcraftPublisher.validate validates inputs with new login', async () => {
-    expect.assertions(0)
+  test('SnapcraftPublisher.validate checks the snap with store credentials', async () => {
+    expect.assertions(2)
 
     const existingSnap = path.join(__dirname, '..', 'README.md')
+    const missingSnap = path.join(__dirname, 'no-such-snap.snap')
     process.env.SNAPCRAFT_STORE_CREDENTIALS = 'credentials'
-
-    // Missing login data but env set
-    let publisher = new publish.SnapcraftPublisher({
+    const publisher = new publish.SnapcraftPublisher({
       loginData: '',
       snapFile: existingSnap,
       release: ''
     })
-    await publisher.validate()
+    await expect(publisher.validate()).resolves.toBeUndefined()
+
+    publisher.snapFile = missingSnap
+    await expect(publisher.validate()).rejects.toThrow(
+      `cannot read snap file "${missingSnap}"`
+    )
   })
 })

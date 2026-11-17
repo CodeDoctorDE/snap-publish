@@ -24,16 +24,12 @@ export class SnapcraftPublisher {
   }
 
   async validate(): Promise<void> {
-    if (process.env.SNAPCRAFT_STORE_CREDENTIALS) {
-      return
-    }
-
-    if (!this.loginData) {
+    if (!process.env.SNAPCRAFT_STORE_CREDENTIALS && !this.loginData) {
       throw new Error('login_data is empty')
     }
     try {
       await fs.promises.access(this.snapFile, fs.constants.R_OK)
-    } catch (error) {
+    } catch {
       throw new Error(`cannot read snap file "${this.snapFile}"`)
     }
   }
@@ -44,10 +40,10 @@ export class SnapcraftPublisher {
     )
     try {
       const loginfile = path.join(tmpdir, 'login.txt')
-      await fs.promises.writeFile(loginfile, this.loginData)
+      await fs.promises.writeFile(loginfile, this.loginData, {mode: 0o600})
       await exec.exec('snapcraft', ['login', '--with', loginfile])
     } finally {
-      await fs.promises.rmdir(tmpdir, {recursive: true})
+      await fs.promises.rm(tmpdir, {recursive: true, force: true})
     }
   }
 
