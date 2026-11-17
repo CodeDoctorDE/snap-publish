@@ -9,10 +9,10 @@ on: # rebuild any PRs and main branch changes
 
 jobs:
   unit: # make sure build/ci work properly
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-    - uses: actions/checkout@v7
-    - uses: actions/setup-node@v7
+    - uses: actions/checkout@v7.0.1
+    - uses: actions/setup-node@v7.1.0
       with:
         node-version: '24'
         cache: npm
@@ -22,10 +22,10 @@ jobs:
   integration: # make sure the action works on a clean machine without building
     # Only run integration test if we have access to secrets
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/releases/')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-    - uses: actions/checkout@v7
-    - uses: CodeDoctorDE/snap-build@498637c212db0c4443b8f7f51acc720bb3407844 # deps/node24
+    - uses: actions/checkout@v7.0.1
+    - uses: CodeDoctorDE/snap-build@d58a0cbf6a491a03927bdd22b6630397f8295cf5 # deps/node24
       id: build
       with:
         path: './sample-project'

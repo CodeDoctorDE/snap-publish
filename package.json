@@ -3,14 +3,13 @@
   "version": "1.2.0",
   "private": true,
   "description": "A Github action that publishes snapcraft projects",
-  "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
-    "lint": "eslint src",
-    "pack": "ncc build",
-    "test": "jest",
+    "lint": "oxlint src",
+    "pack": "esbuild src/main.ts --bundle --platform=node --target=node24 --format=esm --banner:js='import {createRequire} from \"node:module\"; const require = createRequire(import.meta.url);' --outfile=dist/index.js",
+    "test": "vitest run",
     "all": "npm run build && npm run format-check && npm run lint && npm run pack && npm test"
   },
   "repository": {
@@ -25,22 +24,19 @@
   "author": "James Henstridge",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^2.0.3",
-    "@actions/exec": "^2.0.0"
+    "@actions/core": "^3.0.1",
+    "@actions/exec": "^3.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.0",
-    "@vercel/ncc": "^0.45.0",
-    "eslint": "^10.15.0",
-    "jest": "^30.0.0",
-    "prettier": "^3.3.3",
-    "ts-jest": "^29.4.15",
-    "typescript": "~6.0.0",
-    "typescript-eslint": "^8.73.0"
+    "@types/node": "^24.19.2",
+    "esbuild": "^0.28.2",
+    "oxlint": "^1.94.0",
+    "prettier": "^3.10.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
   },
   "engines": {
     "node": ">=24"
-  }
+  },
+  "type": "module"
 }

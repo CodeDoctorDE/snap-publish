@@ -1,16 +1,20 @@
 // -*- mode: javascript; js-indent-level: 2 -*-
 
-import * as fs from 'fs'
-import * as path from 'path'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import * as exec from '@actions/exec'
-import * as publish from '../src/publish'
-import * as tools from '../src/tools'
+import * as publish from '../src/publish.js'
+import * as tools from '../src/tools.js'
+import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest'
+
+vi.mock('@actions/exec', {spy: true})
+vi.mock('../src/tools.js', {spy: true})
 
 test('SnapcraftPublisher.validate validates inputs', async () => {
   expect.assertions(2)
 
-  const existingSnap = path.join(__dirname, '..', 'README.md')
-  const missingSnap = path.join(__dirname, 'no-such-snap.snap')
+  const existingSnap = path.join(import.meta.dirname, '..', 'README.md')
+  const missingSnap = path.join(import.meta.dirname, 'no-such-snap.snap')
 
   // No error on valid inputs
   let publisher = new publish.SnapcraftPublisher({
@@ -42,7 +46,7 @@ test('SnapcraftPublisher.validate validates inputs', async () => {
 test('SnapcraftPublisher.login deletes the login data', async () => {
   expect.assertions(2)
 
-  const execMock = jest
+  const execMock = vi
     .spyOn(exec, 'exec')
     .mockImplementation(
       async (program: string, args?: string[]): Promise<number> => {
@@ -68,7 +72,7 @@ test('SnapcraftPublisher.login deletes the login data', async () => {
 test('SnapcraftPublisher.login deletes the login data on login failure', async () => {
   expect.assertions(3)
 
-  const execMock = jest
+  const execMock = vi
     .spyOn(exec, 'exec')
     .mockImplementation(
       async (program: string, args?: string[]): Promise<number> => {
@@ -94,13 +98,13 @@ test('SnapcraftPublisher.login deletes the login data on login failure', async (
 test('SnapcraftPublisher.publish publishes the snap', async () => {
   expect.assertions(5)
 
-  const ensureSnapd = jest
+  const ensureSnapd = vi
     .spyOn(tools, 'ensureSnapd')
     .mockImplementation(async (): Promise<void> => {})
-  const ensureSnapcraft = jest
+  const ensureSnapcraft = vi
     .spyOn(tools, 'ensureSnapcraft')
     .mockImplementation(async (): Promise<void> => {})
-  const execMock = jest
+  const execMock = vi
     .spyOn(exec, 'exec')
     .mockImplementation(
       async (program: string, args?: string[]): Promise<number> => {
@@ -132,13 +136,13 @@ test('SnapcraftPublisher.publish publishes the snap', async () => {
 test('SnapcraftPublisher.publish can release the published snap', async () => {
   expect.assertions(5)
 
-  const ensureSnapd = jest
+  const ensureSnapd = vi
     .spyOn(tools, 'ensureSnapd')
     .mockImplementation(async (): Promise<void> => {})
-  const ensureSnapcraft = jest
+  const ensureSnapcraft = vi
     .spyOn(tools, 'ensureSnapcraft')
     .mockImplementation(async (): Promise<void> => {})
-  const execMock = jest
+  const execMock = vi
     .spyOn(exec, 'exec')
     .mockImplementation(
       async (program: string, args?: string[]): Promise<number> => {
@@ -173,7 +177,7 @@ describe('process.env', () => {
   const env = process.env
 
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     process.env = {...env}
   })
 
@@ -184,13 +188,13 @@ describe('process.env', () => {
   test('SnapcraftPublisher.publish can release the published snap with new login', async () => {
     expect.assertions(5)
 
-    const ensureSnapd = jest
+    const ensureSnapd = vi
       .spyOn(tools, 'ensureSnapd')
       .mockImplementation(async (): Promise<void> => {})
-    const ensureSnapcraft = jest
+    const ensureSnapcraft = vi
       .spyOn(tools, 'ensureSnapcraft')
       .mockImplementation(async (): Promise<void> => {})
-    const execMock = jest
+    const execMock = vi
       .spyOn(exec, 'exec')
       .mockImplementation(
         async (program: string, args?: string[]): Promise<number> => {
@@ -225,8 +229,8 @@ describe('process.env', () => {
   test('SnapcraftPublisher.validate checks the snap with store credentials', async () => {
     expect.assertions(2)
 
-    const existingSnap = path.join(__dirname, '..', 'README.md')
-    const missingSnap = path.join(__dirname, 'no-such-snap.snap')
+    const existingSnap = path.join(import.meta.dirname, '..', 'README.md')
+    const missingSnap = path.join(import.meta.dirname, 'no-such-snap.snap')
     process.env.SNAPCRAFT_STORE_CREDENTIALS = 'credentials'
     const publisher = new publish.SnapcraftPublisher({
       loginData: '',
