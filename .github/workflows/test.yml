@@ -25,10 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
-    - uses: snapcore/action-build@v1
+    - uses: CodeDoctorDE/snap-build@498637c212db0c4443b8f7f51acc720bb3407844 # deps/node24
       id: build
       with:
         path: './sample-project'
+        snapcraft-args: pack
     - uses: ./
       with:
         snap: ${{ steps.build.outputs.snap }}
