@@ -19,8 +19,7 @@ jobs:
     - run: npm ci
     - run: npm run all
     - run: git diff --exit-code -- dist
-  integration: # make sure the action works on a clean machine without building
-    # Only run integration test if we have access to secrets
+  integration:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/releases/')
     runs-on: ubuntu-26.04
     steps:
@@ -30,7 +29,16 @@ jobs:
       with:
         path: './sample-project'
         snapcraft-args: pack
+    - name: Check for sample Store credentials
+      id: store
+      env:
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+      run: |
+        if [ -n "$SNAPCRAFT_STORE_CREDENTIALS" ]; then
+          echo "configured=true" >> "$GITHUB_OUTPUT"
+        fi
     - uses: ./
+      if: steps.store.outputs.configured == 'true'
       with:
         snap: ${{ steps.build.outputs.snap }}
         release: edge
