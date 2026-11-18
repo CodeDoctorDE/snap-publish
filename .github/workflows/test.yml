@@ -32,7 +32,7 @@ jobs:
     - name: Check for sample Store credentials
       id: store
       env:
-        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_CREDENTIALS }}
       run: |
         if [ -n "$SNAPCRAFT_STORE_CREDENTIALS" ]; then
           echo "configured=true" >> "$GITHUB_OUTPUT"
@@ -43,4 +43,4 @@ jobs:
         snap: ${{ steps.build.outputs.snap }}
         release: edge
       env:
-        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_CREDENTIALS }}
